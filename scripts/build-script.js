@@ -59,7 +59,7 @@ async function publish() {
         process.exit(1)
       } else {
         console.log(stderr);
-        resolve(success);
+        resolve(stderr);
       }
     });
   })

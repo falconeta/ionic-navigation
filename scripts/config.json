@@ -1,4 +1,4 @@
 {
-  "priority": ["uc-types", "uc-core", "uc-security", "uc-navigation", "uc-ui"],
+  "priority": ["navigation"],
   "pathLog": "./logs/"
 }

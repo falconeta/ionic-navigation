@@ -29,7 +29,7 @@ program
   .option('--debug', 'Debug this script', false)
   .option('-n, --package-name <library>', 'Library name to build (name declared inside package.json)')
   .option('-c, --clean', 'Clean all dependencies in library as well as in app', false)
-  .option('-p --application-path <path>', 'Path to App', path.join(__dirname, '../../MBx'));
+  .option('-p --application-path <path>', 'Path to App', path.join(__dirname, '../'));
 
 program.parse(process.argv);
 
@@ -44,8 +44,6 @@ let isWatch = program.watch,
   isClean = program.clean,
   isSequential = program.sequential
 
-const appPackageJson = require(`${pathApp}/package.json`);
-
 let isFirstRun = true;
 let packageJson = "";
 
@@ -53,20 +51,17 @@ let packageJson = "";
 /**
  * Create TGZ from built files
  */
-async function createTGZ() {
+async function publish() {
   return new Promise((resolve) => {
-    exec('npm pack', {
-      cwd: path.join(__dirname, `../dist/${packageName}`)
-    }).
-      on(
-        'close', (success) => {
-          console.log(`Created tgz`, success)
-          resolve(success);
-        })
-      .on('error', error => {
-        console.error(`Error occurred during tgz creation ${error}`);
+    exec(`npm publish --access=public ../dist/${packageName}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error occurred during publication ${error}`);
         process.exit(1)
-      })
+      } else {
+        console.log(stderr);
+        resolve(success);
+      }
+    });
   })
 }
 
@@ -77,12 +72,11 @@ async function movePackageInDistFolder() {
   const to = path.join(__dirname, `../release/${packageName}/`);
 
   if (!isDev) {
-    await createTGZ()
-    console.log('Moving tgz in dist position');
+    await publish()
+    console.log('published library on npmjs');
     if (!fs.existsSync(to)) {
       fs.mkdirSync(to, { recursive: true });
     }
-    moveFile(from, path.join(to, `${packageJson.version}.tgz`));
   } else {
     copyLibIntoAppDeps()
   }

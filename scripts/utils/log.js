@@ -26,7 +26,7 @@ function formattedDate() {
 }
 
 function removeColor(message) {
-  return message = message.replace(/\x1b\[(3[1-7]|0)m/gm, '');
+  return message;
 }
 
 
